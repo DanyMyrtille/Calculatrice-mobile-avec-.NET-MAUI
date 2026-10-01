@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Calculatrice.MainPage"
+             BackgroundColor="#121212"
+             Title="Calculatrice">
+
+    <ContentPage.Resources>
+        <Style x:Key="KeyBase" TargetType="Button">
+            <Setter Property="CornerRadius" Value="18" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="MinimumWidthRequest" Value="0" />
+            <Setter Property="MinimumHeightRequest" Value="0" />
+            <Setter Property="FontSize" Value="28" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="TextColor" Value="White" />
+        </Style>
+        <Style x:Key="DigitKey" TargetType="Button" BasedOn="{StaticResource KeyBase}">
+            <Setter Property="BackgroundColor" Value="#2B2B2E" />
+        </Style>
+        <Style x:Key="FuncKey" TargetType="Button" BasedOn="{StaticResource KeyBase}">
+            <Setter Property="BackgroundColor" Value="#4A4A4F" />
+        </Style>
+        <Style x:Key="OpKey" TargetType="Button" BasedOn="{StaticResource KeyBase}">
+            <Setter Property="BackgroundColor" Value="#FF9F0A" />
+        </Style>
+        <Style x:Key="EqKey" TargetType="Button" BasedOn="{StaticResource KeyBase}">
+            <Setter Property="BackgroundColor" Value="#30D158" />
+        </Style>
+    </ContentPage.Resources>
+
+    <!-- LAYOUT 1 : Grid racine (afficheur + clavier), reconfiguré selon l'orientation -->
+    <Grid x:Name="RootGrid"
+          Padding="12"
+          RowSpacing="8"
+          ColumnSpacing="12"
+          RowDefinitions="*,2.2*">
+
+        <!-- LAYOUT 2 : Border = panneau de l'afficheur -->
+        <Border x:Name="DisplayBorder"
+                Grid.Row="0"
+                BackgroundColor="#1C1C1E"
+                Stroke="#2B2B2E"
+                StrokeThickness="1"
+                Padding="16,10">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="20" />
+            </Border.StrokeShape>
+
+            <Grid RowDefinitions="Auto,*">
+
+                <!-- LAYOUT 3 : HorizontalStackLayout = en-tête aligné -->
+                <HorizontalStackLayout Grid.Row="0" Spacing="8">
+                    <Label Text="Calculatrice"
+                           FontSize="14"
+                           TextColor="#8E8E93" />
+                    <Label Text="•"
+                           FontSize="14"
+                           TextColor="#FF9F0A" />
+                    <Label Text="Standard"
+                           FontSize="14"
+                           TextColor="#8E8E93" />
+                </HorizontalStackLayout>
+
+                <!-- LAYOUT 4 : VerticalStackLayout = opération au-dessus du résultat -->
+                <VerticalStackLayout Grid.Row="1"
+                                     VerticalOptions="End"
+                                     Spacing="2">
+
+                    <!-- LAYOUT 5 : ScrollView = l'opération longue défile au lieu de déborder -->
+                    <ScrollView x:Name="ExpressionScroll"
+                                Orientation="Horizontal"
+                                HorizontalScrollBarVisibility="Never">
+                        <Label x:Name="ExpressionLabel"
+                               FontSize="20"
+                               TextColor="#8E8E93"
+                               LineBreakMode="NoWrap"
+                               HorizontalTextAlignment="End" />
+                    </ScrollView>
+
+                    <Label x:Name="ResultLabel"
+                           Text="0"
+                           FontSize="56"
+                           TextColor="White"
+                           LineBreakMode="NoWrap"
+                           HorizontalOptions="End"
+                           HorizontalTextAlignment="End" />
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <!-- Clavier : Grid 5 lignes x 4 colonnes en proportions (*) => s'adapte à tout écran -->
+        <Grid x:Name="Keypad"
+              Grid.Row="1"
+              RowDefinitions="*,*,*,*,*"
+              ColumnDefinitions="*,*,*,*">
+
+            <Button Grid.Row="0" Grid.Column="0" Text="C"  ClassId="C"    Style="{StaticResource FuncKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="0" Grid.Column="1" Text="←"  ClassId="BACK" Style="{StaticResource FuncKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="0" Grid.Column="2" Text="%"  ClassId="PCT"  Style="{StaticResource FuncKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="0" Grid.Column="3" Text="÷"  ClassId="/"    Style="{StaticResource OpKey}"   Clicked="OnKeyClicked" />
+
+            <Button Grid.Row="1" Grid.Column="0" Text="7" ClassId="7" Style="{StaticResource DigitKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="1" Grid.Column="1" Text="8" ClassId="8" Style="{StaticResource DigitKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="1" Grid.Column="2" Text="9" ClassId="9" Style="{StaticResource DigitKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="1" Grid.Column="3" Text="×" ClassId="*" Style="{StaticResource OpKey}"    Clicked="OnKeyClicked" />
+
+            <Button Grid.Row="2" Grid.Column="0" Text="4" ClassId="4" Style="{StaticResource DigitKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="2" Grid.Column="1" Text="5" ClassId="5" Style="{StaticResource DigitKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="2" Grid.Column="2" Text="6" ClassId="6" Style="{StaticResource DigitKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="2" Grid.Column="3" Text="−" ClassId="-" Style="{StaticResource OpKey}"    Clicked="OnKeyClicked" />
+
+            <Button Grid.Row="3" Grid.Column="0" Text="1" ClassId="1" Style="{StaticResource DigitKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="3" Grid.Column="1" Text="2" ClassId="2" Style="{StaticResource DigitKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="3" Grid.Column="2" Text="3" ClassId="3" Style="{StaticResource DigitKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="3" Grid.Column="3" Text="+" ClassId="+" Style="{StaticResource OpKey}"    Clicked="OnKeyClicked" />
+
+            <Button Grid.Row="4" Grid.Column="0" Text="±" ClassId="SIGN" Style="{StaticResource DigitKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="4" Grid.Column="1" Text="0" ClassId="0"    Style="{StaticResource DigitKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="4" Grid.Column="2" Text="," ClassId="DOT"  Style="{StaticResource DigitKey}" Clicked="OnKeyClicked" />
+            <Button Grid.Row="4" Grid.Column="3" Text="=" ClassId="EQ"   Style="{StaticResource EqKey}"    Clicked="OnKeyClicked" />
+        </Grid>
+    </Grid>
+</ContentPage>
